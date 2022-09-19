@@ -59,12 +59,8 @@ for script in "$@"; do
     mkdir -p "logs/$script"
     get_date_time
 
-    script_name=replace_slash $script
-    image_name=replace_slash $imagem
-
-
-    log_erro="logs/$script_name/log-erro-$script_name-$image_name-${current_date}_$current_time.csv"
-    log_arquivo="logs/$script_name/log-$script_name-$image_name-${current_date}_$current_time.csv"
+    log_erro="logs/$script/log-erro-$script-${imagem//\//\-}-${current_date}_$current_time.csv"
+    log_arquivo="logs/$script/log-$script-${imagem//\//\-}-${current_date}_$current_time.csv"
 
     if [ $rmi -eq 0 ]; then
         echo "count,pull_time,instantiate_time,stop_time,container_removal_time,image_removal_time,date,time" >$log_arquivo

@@ -51,7 +51,7 @@ function remove_container() {
     container_removal_time=$(($(date +%s%N) - start))
 
     start=$(date +%s%N)
-    if ! podman rmi $imagem >/dev/null 2>/tmp/ERROR; then
+    if ! podman rmi $imagemsrc$imagem >/dev/null 2>/tmp/ERROR; then
         errcount=$((errcount + 1))
         get_date_time
         echo "Falha ao remover imagem $imagem,$(</tmp/ERROR),$current_date,$current_time" >>$log_erro

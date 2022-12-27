@@ -1,14 +1,22 @@
 #!/bin/bash
+#variáveis de controle
+
+reboot_time=0
+memory_maximum=0
+is_predicted=0
+memtotal=0
 
 function reboot_machine() {
   shutdown -r "$1"
 }
 
 function soft_kill_virtualbox() {
-  vboxmanage controlvm vmDebian reset -d
+  if (awk -v n1="$memory_maximum" -v n2="$memtotal" 'BEGIN {print (n1<=n2)}'); then
+    vboxmanage controlvm vmDebian reset -d
+  fi
 }
 
-function predicted_method() {
+function predict_method() {
   echo "predict method"
 }
 
@@ -19,19 +27,21 @@ function is_number() {
   fi
   return 0
 }
-#variáveis de controle
 
-reboot_time=0
-is_soft_kill=0
-is_predicted=0
 
 #extraindo parametros
 while getopts 'p:s:k:' flag; do
   case $flag in
-  k) is_soft_kill=1 ;;
+  k)
+    if ! is_number $OPTARG; then
+      echo "script usage $(basename "$0")  [-s <integer>] [-k <integer>] [-p]" >&2
+      exit 1
+    fi
+    memory_maximum=$OPTARG
+    ;;
   s)
     if ! is_number $OPTARG; then
-      echo "script usage $(basename "$0")  [-s <integer>] [-k] [-p]" >&2
+      echo "script usage $(basename "$0")  [-s <integer>] [-k <integer>] [-p]" >&2
       exit 1
     fi
 
@@ -39,29 +49,27 @@ while getopts 'p:s:k:' flag; do
     ;;
   p) is_predicted=1 ;;
   ?)
-    echo "script usage $(basename "$0")  [-s <integer>] [-k] [-p]" >&2
+    echo "script usage $(basename "$0")  [-s <integer>] [-k <integer>] [-p]" >&2
     exit 1
     ;;
   esac
 done
 shift "$((OPTIND - 1))"
 
+if [ "$reboot_time" -gt 0 ]; then
+  reboot_machine "$reboot_time"
+fi
+
 while true; do
   :
-
-done
-
-if [ "$is_soft_kill" -eq 1 ]; then
-  soft_kill_virtualbox
-else
-  if [ "$is_predicted" -eq 1 ]; then
-    predicted_method
+  ./monitoramento-networkmanager.sh
+  ./monitoramento-VBoxHeadless.sh
+  ./monitoramento-VBoxXPCOMIPCD.sh
+  if [ "$memory_maximum" -gt 0 ]; then
+    soft_kill_virtualbox
   else
-    if [ "$reboot_time" -eq 0 ]; then
-      reboot_machine "$reboot_time"
-    else
-      echo "script usage $(basename "$0")  [-s <integer>] [-k] [-p]" >&2
-      exit 1
+    if [ "$is_predicted" -eq 1 ]; then
+      predict_method
     fi
   fi
-fi
+done

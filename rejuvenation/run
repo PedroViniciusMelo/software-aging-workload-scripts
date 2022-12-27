@@ -1,0 +1,67 @@
+#!/bin/bash
+
+function reboot_machine() {
+  shutdown -r "$1"
+}
+
+function soft_kill_virtualbox() {
+  vboxmanage controlvm vmDebian reset -d
+}
+
+function predicted_method() {
+  echo "predict method"
+}
+
+function is_number() {
+  local re='^[0-9]+$'
+  if ! [[ $1 =~ $re ]]; then
+    return 1
+  fi
+  return 0
+}
+#variáveis de controle
+
+reboot_time=0
+is_soft_kill=0
+is_predicted=0
+
+#extraindo parametros
+while getopts 'p:s:k:' flag; do
+  case $flag in
+  k) is_soft_kill=1 ;;
+  s)
+    if ! is_number $OPTARG; then
+      echo "script usage $(basename "$0")  [-s <integer>] [-k] [-p]" >&2
+      exit 1
+    fi
+
+    reboot_time=$OPTARG
+    ;;
+  p) is_predicted=1 ;;
+  ?)
+    echo "script usage $(basename "$0")  [-s <integer>] [-k] [-p]" >&2
+    exit 1
+    ;;
+  esac
+done
+shift "$((OPTIND - 1))"
+
+while true; do
+  :
+
+done
+
+if [ "$is_soft_kill" -eq 1 ]; then
+  soft_kill_virtualbox
+else
+  if [ "$is_predicted" -eq 1 ]; then
+    predicted_method
+  else
+    if [ "$reboot_time" -eq 0 ]; then
+      reboot_machine "$reboot_time"
+    else
+      echo "script usage $(basename "$0")  [-s <integer>] [-k] [-p]" >&2
+      exit 1
+    fi
+  fi
+fi

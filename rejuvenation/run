@@ -12,7 +12,6 @@ function reboot_machine() {
 }
 
 function soft_kill_virtualbox() {
-  echo "Soft kill VirtualBox"
   if (awk -v n1="$memory_maximum" -v n2="$memtotal" 'BEGIN {print (n1<=n2)}'); then
     echo "Memory exceeded, executing Soft kill for VirtualBox process"
     vboxmanage controlvm vmDebian reset -d

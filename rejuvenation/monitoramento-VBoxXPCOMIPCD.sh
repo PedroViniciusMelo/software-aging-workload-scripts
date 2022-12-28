@@ -14,7 +14,7 @@ if [ -n "$pid" ]; then
   vsz=$(echo "$dados" | awk '{print $12}')
   swap=$(cat /proc/"$pid"/status | grep Swap | awk '{print $2}')
 
-  memtotal=$(awk "BEGIN{ print $mem + $memtotal }")
+  memtotal=$(awk "BEGIN{ print $mem + $memtotal }" | sed 's/,/./g')
 
   echo "$cpu $mem $vmrss $vsz $thread $swap" >>monitoramento-VBoxXPCOMIPCD.txt
 else

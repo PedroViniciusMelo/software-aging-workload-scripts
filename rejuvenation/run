@@ -31,7 +31,6 @@ function is_number() {
   return 0
 }
 
-
 #extraindo parametros
 while getopts 'p:s:k:' flag; do
   case $flag in
@@ -65,15 +64,15 @@ fi
 
 while true; do
   :
-  source  monitoramento-VBoxXPCOMIPCD.sh
-  source  monitoramento-VBoxHeadless.sh
-  source  monitoramento-VBoxXPCOMIPCD.sh
+  source monitoramento-VBoxXPCOMIPCD.sh
+  source monitoramento-VBoxHeadless.sh
+  source monitoramento-VBoxXPCOMIPCD.sh
   if [ "$memory_maximum" -gt 0 ]; then
     soft_kill_virtualbox
-  else
-    if [ "$is_predicted" -eq 1 ]; then
-      predict_method
-    fi
   fi
-  memory_maximum=0
+  if [ "$is_predicted" -gt 0 ]; then
+    predict_method
+  fi
+  memtotal=0
+  sleep 2
 done

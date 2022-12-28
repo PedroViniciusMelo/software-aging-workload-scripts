@@ -65,9 +65,9 @@ fi
 
 while true; do
   :
-  ./monitoramento-VBoxXPCOMIPCD.sh
-  ./monitoramento-VBoxHeadless.sh
-  ./monitoramento-VBoxXPCOMIPCD.sh
+  monitoramento-VBoxXPCOMIPCD.sh
+  monitoramento-VBoxHeadless.sh
+  monitoramento-VBoxXPCOMIPCD.sh
   if [ "$memory_maximum" -gt 0 ]; then
     soft_kill_virtualbox
   else

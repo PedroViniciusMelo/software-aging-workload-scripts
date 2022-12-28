@@ -31,32 +31,79 @@ function is_number() {
   return 0
 }
 
-#extraindo parametros
-while getopts 'p:s:k:' flag; do
-  case $flag in
-  k)
-    if ! is_number $OPTARG; then
-      echo "script usage $(basename "$0")  [-s <integer>] [-k <integer>] [-p]" >&2
-      exit 1
-    fi
-    memory_maximum=$OPTARG
-    ;;
-  s)
-    if ! is_number $OPTARG; then
-      echo "script usage $(basename "$0")  [-s <integer>] [-k <integer>] [-p]" >&2
-      exit 1
-    fi
+function print_usage() {
+  echo "script usage $(basename "$0")  [-s <integer>] [-k <integer>] [-p]" >&2
+}
 
-    reboot_time=$OPTARG
+if [[ "$1" =~ ^((-{1,2})([Hh]$|[Hh][Ee][Ll][Pp])|)$ ]]; then
+  print_usage
+  exit 1
+else
+  while [[ $# -gt 0 ]]; do
+    opt="$1"
+    shift
+    current_arg="$1"
+    if [[ "$current_arg" =~ ^-{1,2}.* ]]; then
+      echo "WARNING: You may have left an argument blank. Double-check your command."
+    fi
+    case "$opt" in
+    "-r" | "--reboot")
+      reboot_time="$1"
+      shift
+      ;;
+    "-m" | "--memory")
+      memory_maximum="$1"
+      shift
+      ;;
+    "-p" | "--predicted")
+      is_predicted="$1"
+      shift
+      ;;
+    *)
+      echo "ERROR: Invalid option: \"$opt\"" >&2
+      exit 1
+      ;;
+    esac
+  done
+fi
+
+#if [[ "$APPLE" == "" || "$BANANA" == "" ]]; then
+#    echo "ERROR: Options -a and -b require arguments." >&2
+#    exit 1
+#fi
+
+#get optional flags
+while getopts "r:m:p" opt; do
+  case $opt in
+  r)
+    if is_number "$OPTARG"; then
+      reboot_time="$OPTARG"
+    else
+      echo "Invalid argument for -r flag"
+      exit 1
+    fi
     ;;
-  p) is_predicted=1 ;;
-  ?)
-    echo "script usage $(basename "$0")  [-s <integer>] [-k <integer>] [-p]" >&2
+  m)
+    if is_number "$OPTARG"; then
+      memory_maximum="$OPTARG"
+    else
+      echo "Invalid argument for -m flag"
+      exit 1
+    fi
+    ;;
+  p)
+    is_predicted=1
+    ;;
+  \?)
+    echo "Invalid option: -$OPTARG"
+    exit 1
+    ;;
+  :)
+    echo "Option -$OPTARG requires an argument."
     exit 1
     ;;
   esac
 done
-shift "$((OPTIND - 1))"
 
 if [ "$reboot_time" -gt 0 ]; then
   reboot_machine "$reboot_time"

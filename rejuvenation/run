@@ -72,39 +72,6 @@ fi
 #    exit 1
 #fi
 
-#get optional flags
-while getopts "r:m:p" opt; do
-  case $opt in
-  r)
-    if is_number "$OPTARG"; then
-      reboot_time="$OPTARG"
-    else
-      echo "Invalid argument for -r flag"
-      exit 1
-    fi
-    ;;
-  m)
-    if is_number "$OPTARG"; then
-      memory_maximum="$OPTARG"
-    else
-      echo "Invalid argument for -m flag"
-      exit 1
-    fi
-    ;;
-  p)
-    is_predicted=1
-    ;;
-  \?)
-    echo "Invalid option: -$OPTARG"
-    exit 1
-    ;;
-  :)
-    echo "Option -$OPTARG requires an argument."
-    exit 1
-    ;;
-  esac
-done
-
 if [ "$reboot_time" -gt 0 ]; then
   reboot_machine "$reboot_time"
 fi

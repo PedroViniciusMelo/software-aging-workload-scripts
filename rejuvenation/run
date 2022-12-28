@@ -7,11 +7,14 @@ is_predicted=0
 memtotal=0
 
 function reboot_machine() {
+  echo "Machine will reboot after $1 minutes"
   shutdown -r "$1"
 }
 
 function soft_kill_virtualbox() {
+  echo "Soft kill VirtualBox"
   if (awk -v n1="$memory_maximum" -v n2="$memtotal" 'BEGIN {print (n1<=n2)}'); then
+    echo "Memory exceeded, executing Soft kill for VirtualBox process"
     vboxmanage controlvm vmDebian reset -d
   fi
 }
@@ -62,7 +65,7 @@ fi
 
 while true; do
   :
-  ./monitoramento-networkmanager.sh
+  ./monitoramento-VBoxXPCOMIPCD.sh
   ./monitoramento-VBoxHeadless.sh
   ./monitoramento-VBoxXPCOMIPCD.sh
   if [ "$memory_maximum" -gt 0 ]; then
@@ -72,4 +75,5 @@ while true; do
       predict_method
     fi
   fi
+  memory_maximum=0
 done

@@ -5,28 +5,34 @@ reboot_time=0
 memory_maximum=0
 is_predicted=0
 memtotal=0
+start_date=$(date +%s)
+computer_memory=$(free -m | grep Mem | awk '{print $2}')
 
-function reboot_machine() {
-  echo "Machine will reboot after $1 minutes"
-  shutdown -r "$1"
+#checks converts memory to percentage
+function percentage_memory() {
+  awk -v n1="$computer_memory" -v n2="$memory_maximum" 'BEGIN {print 100 * n2 / n1}'  | sed 's/,/./g'
 }
 
+converted_memory=$(percentage_memory)
+
+#checks if date A is greater than date B
+function is_date_greater() {
+  now=$(date +%s)
+  reboot_date=$(date -d "($start_date) +$reboot_time mins" +%s)
+
+  if [ $now -ge $reboot_date ]; then
+    echo 1
+  else
+    echo 0
+  fi
+}
+
+#checks if float A is greater than float B
 function float_gt() {
   awk -v n1="$1" -v n2="$2" 'BEGIN {print (n1>n2)?1:0}'
 }
 
-function soft_kill_virtualbox() {
-  greater=$(float_gt $memtotal $memory_maximum)
-  if [ $greater -eq 1 ]; then
-    echo "Memory exceeded, executing Soft kill for VirtualBox process"
-    vboxmanage controlvm vmDebian reset -d
-  fi
-}
-
-function predict_method() {
-  echo "predict method"
-}
-
+#checks if $1 is a number
 function is_number() {
   local re='^[0-9]+$'
   if ! [[ $1 =~ $re ]]; then
@@ -36,7 +42,31 @@ function is_number() {
 }
 
 function print_usage() {
-  echo "script usage $(basename "$0")  [-s <integer>] [-k <integer>] [-p]" >&2
+  echo "script usage $(basename "$0")  [-t <integer> minutes] [-m <integer> mb] [-p]" >&2
+}
+
+function reboot_machine() {
+  echo "Machine will reboot now"
+  ssh -p 2222 root@localhost "/sbin/shutdown -r now"
+  sleep 30
+}
+
+function time_method() {
+  result=$(is_date_greater)
+  if [ "$result" -eq 1 ]; then
+    reboot_machine
+  fi
+}
+
+function memory_method() {
+  result=$(float_gt $memtotal "$converted_memory")
+  if [ "$result" -eq 1 ]; then
+    reboot_machine
+  fi
+}
+
+function predict_method() {
+  echo "predict method"
 }
 
 if [[ "$1" =~ ^((-{1,2})([Hh]$|[Hh][Ee][Ll][Pp])|)$ ]]; then
@@ -51,7 +81,7 @@ else
       echo "WARNING: You may have left an argument blank. Double-check your command."
     fi
     case "$opt" in
-    "-r" | "--reboot")
+    "-t" | "--time")
       reboot_time="$1"
       shift
       ;;
@@ -76,20 +106,19 @@ fi
 #    exit 1
 #fi
 
-if [ "$reboot_time" -gt 0 ]; then
-  reboot_machine "$reboot_time"
-fi
-
 while true; do
   :
   source monitoramento-VBoxXPCOMIPCD.sh
   source monitoramento-VBoxHeadless.sh
   source monitoramento-VBoxXPCOMIPCD.sh
   if [ "$memory_maximum" -gt 0 ]; then
-    soft_kill_virtualbox
+    memory_method
   fi
   if [ "$is_predicted" -gt 0 ]; then
     predict_method
+  fi
+  if [ "$reboot_time" -gt 0 ]; then
+    time_method
   fi
   memtotal=0
   sleep 2

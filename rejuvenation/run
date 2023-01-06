@@ -1,35 +1,22 @@
 #!/bin/bash
 #variáveis de controle
 
-reboot_time=0
 memory_maximum=0
 is_predicted=0
-memtotal=0
+vm_total_rss=0
+vm_total_vsz=0
 start_date=$(date +%s)
-computer_memory=$(free -m | grep Mem | awk '{print $2}')
-
-#checks converts memory to percentage
-function percentage_memory() {
-  awk -v n1="$computer_memory" -v n2="$memory_maximum" 'BEGIN {print 100 * n2 / n1}'  | sed 's/,/./g'
-}
-
-converted_memory=$(percentage_memory)
+reboot_date=0
+minutes=0
 
 #checks if date A is greater than date B
 function is_date_greater() {
   now=$(date +%s)
-  reboot_date=$(date -d "($start_date) +$reboot_time mins" +%s)
-
   if [ $now -ge $reboot_date ]; then
     echo 1
   else
     echo 0
   fi
-}
-
-#checks if float A is greater than float B
-function float_gt() {
-  awk -v n1="$1" -v n2="$2" 'BEGIN {print (n1>n2)?1:0}'
 }
 
 #checks if $1 is a number
@@ -47,21 +34,26 @@ function print_usage() {
 
 function reboot_machine() {
   echo "Machine will reboot now"
-  ssh -p 2222 root@localhost "/sbin/shutdown -r now"
-  sleep 30
+  ssh -p 2222 root@localhost "/sbin/shutdown -r now" > /dev/null 2>&1
 }
 
 function time_method() {
   result=$(is_date_greater)
   if [ "$result" -eq 1 ]; then
     reboot_machine
+    reboot_date=$(date -d "($reboot_date) +$minutes mins" +%s)
   fi
 }
 
 function memory_method() {
-  result=$(float_gt $memtotal "$converted_memory")
-  if [ "$result" -eq 1 ]; then
+  if [ $vm_total_rss -gt $memory_maximum ]; then
+    echo "RSS exceeded"
     reboot_machine
+  fi
+
+  if [ $vm_total_vsz -gt $memory_maximum ]; then
+      echo "VSS exceeded"
+      reboot_machine
   fi
 }
 
@@ -82,11 +74,12 @@ else
     fi
     case "$opt" in
     "-t" | "--time")
-      reboot_time="$1"
+      minutes=$1
+      reboot_date=$(date -d "($start_date) +$1 mins" +%s)
       shift
       ;;
     "-m" | "--memory")
-      memory_maximum="$1"
+      memory_maximum=$(($1 * 1024))
       shift
       ;;
     "-p" | "--predicted")
@@ -105,9 +98,13 @@ fi
 #    echo "ERROR: Options -a and -b require arguments." >&2
 #    exit 1
 #fi
+echo "cpu mem vmrss vsz threads swap" >monitoramento-VBoxSVC.txt
+echo "cpu mem vmrss vsz threads swap" >monitoramento-VBoxHeadless.txt
+echo "cpu mem vmrss vsz threads swap" >monitoramento-VBoxXPCOMIPCD.txt
 
 while true; do
   :
+  
   source monitoramento-VBoxXPCOMIPCD.sh
   source monitoramento-VBoxHeadless.sh
   source monitoramento-VBoxXPCOMIPCD.sh
@@ -117,9 +114,10 @@ while true; do
   if [ "$is_predicted" -gt 0 ]; then
     predict_method
   fi
-  if [ "$reboot_time" -gt 0 ]; then
+  if [ "$reboot_date" -gt 0 ]; then
     time_method
   fi
-  memtotal=0
+  vm_total_rss=0
+  vm_total_vsz=0
   sleep 2
 done

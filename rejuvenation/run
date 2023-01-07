@@ -76,10 +76,12 @@ else
     "-t" | "--time")
       minutes=$1
       reboot_date=$(date -d "($start_date) +$1 mins" +%s)
+      echo "Inciando testes de rejuvenescimento | A MV irá reinciar a cada $minutes minutos"
       shift
       ;;
     "-m" | "--memory")
       memory_maximum=$(($1 * 1024))
+      echo "Inciando testes de rejuvenescimento | A MV irá reinciar quando o RSS ou VSS extrapolarem  $1 MBS"
       shift
       ;;
     "-p" | "--predicted")
@@ -98,16 +100,30 @@ fi
 #    echo "ERROR: Options -a and -b require arguments." >&2
 #    exit 1
 #fi
-echo "cpu mem vmrss vsz threads swap" >monitoramento-VBoxSVC.txt
-echo "cpu mem vmrss vsz threads swap" >monitoramento-VBoxHeadless.txt
-echo "cpu mem vmrss vsz threads swap" >monitoramento-VBoxXPCOMIPCD.txt
+
+function headers(){
+  mkdir -p logs
+  echo "cpu mem vmrss vsz threads swap" >logs/monitoramento-VBoxSVC.txt
+  echo "cpu mem vmrss vsz threads swap" >logs/monitoramento-VBoxHeadless.txt
+  echo "cpu mem vmrss vsz threads swap" >logs/monitoramento-VBoxXPCOMIPCD.txt
+  echo "usr nice sys iowait soft data hora" >logs/monitoramento-cpu.txt
+  echo "usado data hora" >logs/monitoramento-disco.txt
+  echo "used cached buffer swap-free" >logs/monitoramento-mem.txt
+}
+
+headers
 
 while true; do
   :
   
   source monitoramento-VBoxXPCOMIPCD.sh
   source monitoramento-VBoxHeadless.sh
-  source monitoramento-VBoxXPCOMIPCD.sh
+  source monitoramento-VBoxSVC.sh
+  
+  source monitoramento-cpu.sh
+  source monitoramento-disco.sh
+  source monitoramento-mem.sh
+
   if [ "$memory_maximum" -gt 0 ]; then
     memory_method
   fi

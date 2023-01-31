@@ -1,0 +1,10 @@
+#!/usr/bin/env stap
+
+probe process("ksm").function("ksm_do_scan")
+{
+  # Cálculo da fragmentação de memória
+  mem_frag = @total_pages - @free_pages - @nr_swap_pages;
+  # Impressão da fragmentação de memória
+  printf("%d\n", mem_frag);
+  printf("%d", @total_pages);
+}

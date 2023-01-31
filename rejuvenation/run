@@ -76,12 +76,12 @@ else
     "-t" | "--time")
       minutes=$1
       reboot_date=$(date -d "($start_date) +$1 mins" +%s)
-      echo "Inciando testes de rejuvenescimento | A MV irá reinciar a cada $minutes minutos"
+      echo "Iniciando testes de rejuvenescimento | A MV irá reinciar a cada $minutes minutos"
       shift
       ;;
     "-m" | "--memory")
       memory_maximum=$(($1 * 1024))
-      echo "Inciando testes de rejuvenescimento | A MV irá reinciar quando o RSS ou VSS extrapolarem  $1 MBS"
+      echo "Iniciando testes de rejuvenescimento | A MV irá reinciar quando o RSS ou VSS extrapolarem  $1 MBS"
       shift
       ;;
     "-p" | "--predicted")
@@ -109,6 +109,7 @@ function headers(){
   echo "usr nice sys iowait soft data hora" >logs/monitoramento-cpu.txt
   echo "usado data hora" >logs/monitoramento-disco.txt
   echo "used cached buffer swap-free" >logs/monitoramento-mem.txt
+  echo "usedPages totalPages" >logs/monitoramento-memFrag.txt
 }
 
 headers
@@ -123,6 +124,8 @@ while true; do
   source monitoramento-cpu.sh
   source monitoramento-disco.sh
   source monitoramento-mem.sh
+
+  source monitoramento-mem-frag.sh
 
   if [ "$memory_maximum" -gt 0 ]; then
     memory_method

@@ -103,20 +103,22 @@ fi
 
 function headers(){
   mkdir -p logs
-  echo "cpu mem vmrss vsz threads swap" >logs/monitoramento-VBoxSVC.txt
-  echo "cpu mem vmrss vsz threads swap" >logs/monitoramento-VBoxHeadless.txt
-  echo "cpu mem vmrss vsz threads swap" >logs/monitoramento-VBoxXPCOMIPCD.txt
-  echo "usr nice sys iowait soft data hora" >logs/monitoramento-cpu.txt
-  echo "usado data hora" >logs/monitoramento-disco.txt
-  echo "used cached buffer swap-free" >logs/monitoramento-mem.txt
-  echo "usedPages totalPages" >logs/monitoramento-memFrag.txt
+  echo "cpu;mem;vmrss;vsz;threads;swap;date_time" >logs/monitoramento-VBoxSVC.txt
+  echo "cpu;mem;vmrss;vsz;threads;swap;date_time" >logs/monitoramento-VBoxHeadless.txt
+  echo "cpu;mem;vmrss;vsz;threads;swap;date_time" >logs/monitoramento-VBoxXPCOMIPCD.txt
+  echo "usr;nice;sys;iowait;soft;date_time" >logs/monitoramento-cpu.txt
+  echo "usado;date_time" >logs/monitoramento-disco.txt
+  echo "used;cached;buffer;swap-free;date_time" >logs/monitoramento-mem.txt
+  echo "usedPages;totalPages;date_time" >logs/monitoramento-memFrag.txt
 }
 
 headers
 
 while true; do
   :
-  
+
+  date_time=$(date +%d-%m-%Y-%H:%M:%S)
+
   source monitoramento-VBoxXPCOMIPCD.sh
   source monitoramento-VBoxHeadless.sh
   source monitoramento-VBoxSVC.sh

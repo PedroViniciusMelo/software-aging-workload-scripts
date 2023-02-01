@@ -14,7 +14,7 @@ if [ -n "$pidHead" ]; then
   vm_total_rss=$(($vmrss + $vm_total_rss))
   vm_total_vsz=$(($vsz + $vm_total_vsz))
 
-  echo "$cpu $mem $vmrss $vsz $thread $swap" >>logs/monitoramento-VBoxHeadless.txt
+  echo "$cpu;$mem;$vmrss;$vsz;$thread;$swap;$date_time" >>logs/monitoramento-VBoxHeadless.txt
 else
   echo "pid is empty"
   exit 1

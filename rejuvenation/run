@@ -127,8 +127,6 @@ while true; do
   source monitoramento-disco.sh
   source monitoramento-mem.sh
 
-  source monitoramento-mem-frag.sh
-
   if [ "$memory_maximum" -gt 0 ]; then
     memory_method
   fi

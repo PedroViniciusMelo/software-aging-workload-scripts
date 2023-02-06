@@ -114,6 +114,8 @@ function headers(){
 
 headers
 
+stap -o saida.txt memory_fragmentation/fragmentacao2b.stp  &
+
 while true; do
   :
 

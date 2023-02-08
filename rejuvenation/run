@@ -62,8 +62,7 @@ function predict_method() {
 }
 
 if [[ "$1" =~ ^((-{1,2})([Hh]$|[Hh][Ee][Ll][Pp])|)$ ]]; then
-  print_usage
-  exit 1
+  echo "Iniciando testes de rejuvenescimento | Coleta de dados"
 else
   while [[ $# -gt 0 ]]; do
     opt="$1"
@@ -90,6 +89,7 @@ else
       ;;
     *)
       echo "ERROR: Invalid option: \"$opt\"" >&2
+      print_usage
       exit 1
       ;;
     esac
@@ -114,7 +114,8 @@ function headers(){
 
 headers
 
-stap -o saida.txt memory_fragmentation/fragmentacao2b.stp  &
+stap -o fragmentacao.txt memory_fragmentation/fragmentacao2b.stp  &
+stap -o fragmentacao-reducao.txt memory_fragmentation/probe_fragmentacao-com-reducao.stp  &
 
 while true; do
   :

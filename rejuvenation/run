@@ -109,7 +109,7 @@ function headers(){
   echo "usr;nice;sys;iowait;soft;date_time" >logs/monitoramento-cpu.txt
   echo "usado;date_time" >logs/monitoramento-disco.txt
   echo "used;cached;buffer;swap-free;date_time" >logs/monitoramento-mem.txt
-  echo "usedPages;totalPages;date_time" >logs/monitoramento-memFrag.txt
+  echo "metrica num_zumbis data hora" > monitoramento-zumbis.txt
 }
 
 headers
@@ -129,6 +129,8 @@ while true; do
   source monitoramento-cpu.sh
   source monitoramento-disco.sh
   source monitoramento-mem.sh
+
+  source monitoramento-zumbis.sh
 
   if [ "$memory_maximum" -gt 0 ]; then
     memory_method

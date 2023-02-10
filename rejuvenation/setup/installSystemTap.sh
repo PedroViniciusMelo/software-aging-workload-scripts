@@ -13,4 +13,4 @@ echo "deb-src http://deb.debian.org/debian bullseye-updates main contrib non-fre
 apt update
 apt upgrade -y
 
-apt-get install systemtap linux-image-`uname -r`-dbg linux-headers-`uname -r`
+apt-get install systemtap linux-image-`uname -r`-dbg linux-headers-`uname -r` -y

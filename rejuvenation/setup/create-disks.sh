@@ -12,5 +12,5 @@ count=0
 while [ $count -lt $1 ]
 do
     vboxmanage createhd --filename disk$count.vhd --size $2
-    count=`expr $cont + 1`
+    count=`expr $count + 1`
 done

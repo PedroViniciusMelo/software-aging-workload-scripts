@@ -1,3 +1,3 @@
 num=$(ps aux | awk '{if ($8~"Z"){print $0}}' | wc -l)
 
-echo $num $date_time >>monitoramento-zumbis.txt
+echo $num;$date_time >>logs/monitoramento-zumbis.txt

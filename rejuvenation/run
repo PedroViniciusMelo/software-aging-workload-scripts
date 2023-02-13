@@ -109,7 +109,7 @@ function headers(){
   echo "usr;nice;sys;iowait;soft;date_time" >logs/monitoramento-cpu.txt
   echo "usado;date_time" >logs/monitoramento-disco.txt
   echo "used;cached;buffer;swap-free;date_time" >logs/monitoramento-mem.txt
-  echo "metrica num_zumbis data hora" > monitoramento-zumbis.txt
+  echo "num_zumbis;date_time" > logs/monitoramento-zumbis.txt
 }
 
 headers

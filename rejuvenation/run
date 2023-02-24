@@ -107,7 +107,7 @@ function headers(){
   echo "cpu;mem;vmrss;vsz;threads;swap;date_time" >logs/monitoramento-VBoxHeadless.txt
   echo "cpu;mem;vmrss;vsz;threads;swap;date_time" >logs/monitoramento-VBoxXPCOMIPCD.txt
   echo "usr;nice;sys;iowait;soft;date_time" >logs/monitoramento-cpu.txt
-  echo "usado;date_time" >logs/monitoramento-disco.txt
+  echo "used;date_time" >logs/monitoramento-disco.txt
   echo "used;cached;buffer;swap-free;date_time" >logs/monitoramento-mem.txt
   echo "num_zumbis;date_time" > logs/monitoramento-zumbis.txt
 }

@@ -7,10 +7,10 @@
 # $1 = number of disks
 # $2 = size (MB)
 
-count=0
+count=1
 
 while [ $count -lt $1 ]
 do
-    vboxmanage createhd --filename disk$count.vhd --size $2
+    VBoxManage createmedium disk --filename disk$count.vdh --size 1024 --format VHD --variant Fixed
     count=`expr $count + 1`
 done

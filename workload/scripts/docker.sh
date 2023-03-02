@@ -27,7 +27,7 @@ function add_container() {
     return 1
   fi
   instantiate_time=$(($(date +%s%N) - start))
-  echo "Aqui"
+
   return 0
 }
 
@@ -48,6 +48,6 @@ function remove_container() {
     return 1
   fi
   container_removal_time=$(($(date +%s%N) - start))
- echo "Aqui 2"
+  
   return 0
 }

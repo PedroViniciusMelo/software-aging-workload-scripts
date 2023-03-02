@@ -2,23 +2,13 @@
 
 pull() {
   :
-  if ! podman pull $imagemsrc >/dev/null 2>/tmp/ERROR; then
-      hasError=1
-      return 1
-  fi
+  podman pull $imagemsrc >/dev/null 2>/tmp/ERROR;
 }
 
 remove() {
   :
-  if ! podman rm $container >/dev/null 2>/tmp/ERROR; then
-    hasError=1
-    return 1
-  fi
-  start=$(date +%s%N)
-  if ! podman rmi $imagemsrc >/dev/null 2>/tmp/ERROR; then
-    hasError=1
-    return 1
-  fi
+  podman rm -vf $(podman ps -aq) >/dev/null 2>/tmp/ERROR;
+  podman rmi -f $(podman images -aq)
 }
 
 function add_container() {

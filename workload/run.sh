@@ -3,10 +3,9 @@
 # ./run.sh 1GB docker.io/1GB 100 docker 1
 imagem=$1
 imagemsrc=$2
-repetitions=3
+repetitions=$3
 errcount=0
 script=$4
-first=1
 
 function get_date_time() {
   date_time=($(date +"%F %H-%M-%S"))
@@ -27,22 +26,18 @@ function progress {
   printf "\r$1 / $2 : ${GREEN}${_fill// /#}${_empty// /-} ${_progrees}%% ${errcount} errors${NC}"
 }
 
+mkdir -p "logs"
 mkdir -p "logs/$script"
 get_date_time
 
 log_erro="logs/$script/log-erro-$script-$imagem-${current_date}_$current_time.csv"
 log_arquivo="logs/$script/log-$script-$imagem-${current_date}_$current_time.csv"
-
-if [ $rmi -eq 0 ]; then
-  echo "count,pull_time,instantiate_time,stop_time,container_removal_time,image_removal_time,date,time" >$log_arquivo
-else
-  echo "count,instantiate_time,stop_time,container_removal_time,date,time" >$log_arquivo
-fi
-
-echo "message,reason,date,time" >$log_erro
-
 echo $script | grep -q "rmi"
 rmi=$?
+
+echo "count,pull_time,instantiate_time,stop_time,container_removal_time,image_removal_time,date,time" >$log_arquivo
+echo "message,reason,date,time" >$log_erro
+
 count=0
 hasError=0
 
@@ -52,12 +47,7 @@ echo "Iniciando o teste $script.sh com $repetitions repetições"
 
 progress $count $repetitions
 
-if [[ $first -eq 1 ]]; then
-  :
-  if ! pull; then
-    exit 1
-  fi
-fi
+pull
 
 while [ $count -lt $repetitions ]; do
 
@@ -72,7 +62,7 @@ while [ $count -lt $repetitions ]; do
       if [ $rmi -eq 0 ]; then
         echo "$count,$pull_time,$instantiate_time,$stop_time,$container_removal_time,$image_removal_time,$current_date,$current_time" >>$log_arquivo
       else
-        echo "$count,$instantiate_time,$stop_time,$container_removal_time,$current_date,$current_time" >>$log_arquivo
+        echo "$count,0,$instantiate_time,$stop_time,$container_removal_time,0,$current_date,$current_time" >>$log_arquivo
       fi
     fi
   fi
@@ -92,13 +82,7 @@ while [ $count -lt $repetitions ]; do
   progress $count $repetitions
 done
 
-if [[ $first -eq 1 ]]; then
-  :
-  if ! remove; then
-    echo "Erro ao remover container e imagem"
-    exit 1
-  fi
-fi
+remove
 
 printf "\n"
 

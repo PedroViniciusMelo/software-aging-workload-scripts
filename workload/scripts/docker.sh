@@ -2,23 +2,13 @@
 
 pull() {
   :
-  if ! docker pull $imagemsrc >/dev/null 2>/tmp/ERROR; then
-      hasError=1
-      return 1
-  fi
+  docker pull $imagemsrc >/dev/null 2>/tmp/ERROR;
 }
 
 remove() {
   :
-  if ! docker rm $container >/dev/null 2>/tmp/ERROR; then
-    hasError=1
-    return 1
-  fi
-  start=$(date +%s%N)
-  if ! docker rmi $imagemsrc >/dev/null 2>/tmp/ERROR; then
-    hasError=1
-    return 1
-  fi
+  docker rm -vf $(docker ps -aq) >/dev/null 2>/tmp/ERROR;
+  docker rmi -f $(docker images -aq)
 }
 
 function add_container() {
@@ -37,7 +27,7 @@ function add_container() {
     return 1
   fi
   instantiate_time=$(($(date +%s%N) - start))
-
+  echo "Aqui"
   return 0
 }
 
@@ -58,6 +48,6 @@ function remove_container() {
     return 1
   fi
   container_removal_time=$(($(date +%s%N) - start))
-
+ echo "Aqui 2"
   return 0
 }

@@ -1,5 +1,26 @@
 #!/bin/bash
 
+pull() {
+  :
+  if ! docker pull $imagemsrc >/dev/null 2>/tmp/ERROR; then
+      hasError=1
+      return 1
+  fi
+}
+
+remove() {
+  :
+  if ! docker rm $container >/dev/null 2>/tmp/ERROR; then
+    hasError=1
+    return 1
+  fi
+  start=$(date +%s%N)
+  if ! docker rmi $imagemsrc >/dev/null 2>/tmp/ERROR; then
+    hasError=1
+    return 1
+  fi
+}
+
 function add_container() {
   pull_time=0
   instantiate_time=0

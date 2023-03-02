@@ -1,5 +1,27 @@
 #!/bin/bash
 
+pull() {
+  :
+  if ! podman pull $imagemsrc >/dev/null 2>/tmp/ERROR; then
+      hasError=1
+      return 1
+  fi
+}
+
+remove() {
+  :
+  if ! podman rm $container >/dev/null 2>/tmp/ERROR; then
+    hasError=1
+    return 1
+  fi
+  start=$(date +%s%N)
+  if ! podman rmi $imagemsrc >/dev/null 2>/tmp/ERROR; then
+    hasError=1
+    return 1
+  fi
+}
+
+
 function add_container() {
   pull_time=0
   instantiate_time=0

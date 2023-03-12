@@ -24,7 +24,7 @@ while true; do
   fi
 
   # Adiciona o timestamp e o tempo de resposta ao arquivo CSV
-  echo "$timestamp;$response_time" >> response_times.txt
+  echo "$timestamp;$response_time" >> response_times.csv
 
   # Espera 5 segundos antes de fazer a próxima requisição
   sleep 5

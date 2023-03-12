@@ -1,6 +1,6 @@
 #!/bin/bash
 
-pidXPCO=$(pidof VBoxXPCOMIPCD)
+pidXPCO=$(pidof -s VBoxXPCOMIPCD)
 #echo $pid
 if [ -n "$pidXPCO" ]; then
   dados=$(pidstat -u -h -p $pidXPCO -T ALL -r 1 1 | sed -n '4p')
@@ -14,7 +14,7 @@ if [ -n "$pidXPCO" ]; then
   vm_total_rss=$(($vmrss + $vm_total_rss))
   vm_total_vsz=$(($vsz + $vm_total_vsz))
 
-  echo "$cpu;$mem;$vmrss;$vsz;$thread;$swap;$date_time" >>logs/monitoramento-VBoxXPCOMIPCD.txt
+  echo "$cpu;$mem;$vmrss;$vsz;$thread;$swap;$date_time" >>logs/monitoramento-VBoxXPCOMIPCD.csv
 else
   echo "pid is empty"
   exit 1

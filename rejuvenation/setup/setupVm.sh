@@ -7,16 +7,16 @@ mkdir ../disks
 cp create-disks.sh ../disks
 cd ../disks || exit
 
-./create-disks.sh 50 1024
+./create-disks.sh 51 1024
 
-vboxmanage import "$1".ova
-vboxmanage list hdds
-vboxmanage list vms
+#vboxmanage import "$1".ova
+#vboxmanage list hdds
+#vboxmanage list vms
 
-HOST_IP=$(hostname -I | awk '{print $1}')
-VBoxManage modifyvm "$1" --natpf1 "porta 8080,tcp,$HOST_IP,8080,,80"
+#HOST_IP=$(hostname -I | awk '{print $1}')
+#VBoxManage modifyvm "$1" --natpf1 "porta 8080,tcp,$HOST_IP,8080,,80"
 
-vboxmanage startvm $1 --type headless
+#vboxmanage startvm $1 --type headless
 
 
 

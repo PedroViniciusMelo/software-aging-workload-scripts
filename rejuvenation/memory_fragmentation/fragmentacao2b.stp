@@ -35,6 +35,7 @@ function imprime_valores() {
 		foreach([process,pid,pexecname,ppid,uid] in who)
 			printf("%d,", who[process,pid,pexecname,ppid,uid]);
 	}
+	printf("Ocorrencia: %d", fragmenting)
 }
 
 probe begin{

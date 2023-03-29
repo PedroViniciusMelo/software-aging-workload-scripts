@@ -10,10 +10,10 @@ probe kernel.trace("mm_page_alloc_extfrag"){
 			delete who
 			printf("\n\n>>> Vetor esvaziado\n\n,")
 		}
-		printf("P: %s(%d) / Pai: %s(%d) / UID: %d,", execname(),pid(),pexecname(),ppid(),uid())
+		printf("Processo: %s(%d) / Pai: %s(%d) / UID: %d,", execname(),pid(),pexecname(),ppid(),uid())
 		index++
 	}
-	who[execname(),pid(),pexecname(),ppid(),uid()] += 1
+	who[execname(),pid(),pexecname(),ppid(),uid()]++
 	alloc = $alloc_order
 	fallback = $fallback_order	
 	if(fallback<alloc){
@@ -22,34 +22,38 @@ probe kernel.trace("mm_page_alloc_extfrag"){
 }
 
 function imprime_processos() {
-	print("\n")
-	printf("Processo,")
-	foreach([process,pid,pexecname,ppid,uid] in who)
-		printf("%s(%d)/Pai: %s(%d)/UID: %d#%d,", process,pid,pexecname,ppid,uid,who[process,pid,pexecname,ppid,uid]);	
+	foreach([process,pid,pexecname,ppid,uid] in who){
+		printf("\nProcesso: %s(%d) \t Pai: %s(%d) \t UID: %d \t Vezes: %d", process,pid,pexecname,ppid,uid,who[process,pid,pexecname,ppid,uid]);
+	}
 }
 
 function imprime_valores() {
 	if(index > 0){
-		print("\n")
-		printf("%s,", ctime(gettimeofday_s()))
-		foreach([process,pid,pexecname,ppid,uid] in who)
-			printf("%d,", who[process,pid,pexecname,ppid,uid]);
+		printf("\n%s\n", ctime(gettimeofday_s()));
+		foreach([process,pid,pexecname,ppid,uid] in who){
+		    printf("P%d: %d,", pid, who[process,pid,pexecname,ppid,uid]);
+		}
 	}
-	printf("Ocorrencia: %d", fragmenting)
 }
 
 probe begin{
-	printf(",")
+	printf(",");
 }
 
 //tempo a cada impressao dos valores
-probe timer.s(120) {
-	imprime_valores()
+probe timer.s(30) {
+    printf("\n\nProcessos: \n\n");
+	imprime_processos();
+	printf("\n\nValores dos processos: \n\n");
+	imprime_valores();
+	printf("Ocorrencia: %d", fragmenting);
 }
 
 probe end{
-	imprime_valores()	
-	imprime_processos()
-	printf("Ocorrencia: %d", fragmenting)
+	printf("\n\nProcessos: \n\n");
+    imprime_processos();
+    printf("\n\nValores dos processos: \n\n");
+    imprime_valores();
+    printf("Ocorrencia: %d", fragmenting);
 }
 

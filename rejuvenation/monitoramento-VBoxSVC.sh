@@ -11,8 +11,8 @@ if [ -n "$pidSVC" ]; then
   vsz=$(echo "$dados" | awk '{print $12}')
   swap=$(cat /proc/"$pidSVC"/status | grep Swap | awk '{print $2}')
 
-  vm_total_rss=$(($vmrss + $vm_total_rss))
-  vm_total_vsz=$(($vsz + $vm_total_vsz))
+  #vm_total_rss=$(($vmrss + $vm_total_rss))
+  #vm_total_vsz=$(($vsz + $vm_total_vsz))
 
   echo "$cpu;$mem;$vmrss;$vsz;$thread;$swap;$date_time" >>logs/monitoramento-VBoxSVC.csv
 else

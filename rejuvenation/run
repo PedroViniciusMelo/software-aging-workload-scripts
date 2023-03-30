@@ -120,7 +120,7 @@ function headers() {
 
 headers
 
-./workload.sh vmDebian disks/ 50 &
+./workload.sh vmDebian disks/disk 50 &
 
 stap -o fragmentacao.txt memory_fragmentation/fragmentacao2b.stp &
 stap -o fragmentacao-reducao.txt memory_fragmentation/probe_fragmentacao-com-reducao.stp &

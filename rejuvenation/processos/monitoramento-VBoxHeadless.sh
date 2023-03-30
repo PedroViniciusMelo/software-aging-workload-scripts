@@ -17,7 +17,7 @@ while true; do
     vsz=$(echo "$dados" | awk '{print $12}')
     swap=$(cat /proc/"$pidHead"/status | grep Swap | awk '{print $2}')
 
-    echo "$cpu;$mem;$vmrss;$vsz;$thread;$swap;$date_time" >> ../logs/monitoramento-VBoxHeadless.csv
+    echo "$cpu;$mem;$vmrss;$vsz;$thread;$swap;$date_time" >> logs/monitoramento-VBoxHeadless.csv
   else
     echo "pid is empty"
   fi

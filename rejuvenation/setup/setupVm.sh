@@ -9,14 +9,19 @@ cd ../disks || exit
 
 ./create-disks.sh 51 1024
 
-#vboxmanage import "$1".ova
-#vboxmanage list hdds
-#vboxmanage list vms
+cd ..
+vboxmanage import vmDebian.ova
+vboxmanage list hdds
+vboxmanage list vms
 
-#HOST_IP=$(hostname -I | awk '{print $1}')
-#VBoxManage modifyvm "$1" --natpf1 "porta 8080,tcp,$HOST_IP,8080,,80"
+HOST_IP=$(hostname -I | awk '{print $1}')
+VBoxManage modifyvm vmDebian --natpf1 "porta 8080,tcp,$HOST_IP,8080,,80"
 
-#vboxmanage startvm $1 --type headless
+vboxmanage startvm vmDebian --type headless
+
+sleep 10
+
+curl http://localhost:8080
 
 
 

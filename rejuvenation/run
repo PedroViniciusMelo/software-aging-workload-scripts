@@ -1,15 +1,25 @@
 #!/bin/bash
-#variáveis de controle
 
+
+#Memory method
 memory_maximum=0
-is_predicted=0
+
 vm_total_rss=0
 vm_total_vsz=0
+
+#TODO Predict method
+is_predicted=0
+
+#Time method
 start_date=$(date +%s)
 reboot_date=0
 minutes=0
+
+#Control variables
 reboot_count=0
 server_status=0
+sleep_time=10
+server_down_start=0
 
 #checks if date A is greater than date B
 function is_date_greater() {
@@ -37,9 +47,11 @@ function print_usage() {
 function reboot_machine() {
   reboot_count=$((reboot_count + 1))
   server_status=-1
-  echo "server_down; period" > logs/server_status.log
+  server_down_start=$(date +%s)
+  sleep_time=1
   echo "Machine will reboot now"
   ssh -p 2222 root@localhost "/sbin/shutdown -r now" >/dev/null 2>&1
+  sleep 2
 }
 
 function time_method() {
@@ -116,6 +128,8 @@ function headers() {
   echo "used;date_time" >logs/monitoramento-disco.csv
   echo "used;cached;buffer;swap-free;date_time" >logs/monitoramento-mem.csv
   echo "num_zumbis;date_time" >logs/monitoramento-zumbis.csv
+  echo "server_down; period; seconds" > logs/server_status.csv
+
 }
 
 headers
@@ -156,13 +170,17 @@ while true; do
   if [ "$server_status" -eq "-1" ]; then
     code=$(curl -w "%{http_code}" -o /dev/null -s "http://localhost:8080")
     if [ "$code" -eq 200 ]; then
+      date_time=$(date +%d-%m-%Y-%H:%M:%S)
+      server_down_end=$(date +%s)
+      result="$((server_down_end - server_down_start))"
       server_status=0
-    else
-      echo "$date_time; $reboot_count" >> logs/server_status.log
+      server_down_start=0
+      sleep_time=10
+      echo "$date_time; $reboot_count; $result" >> logs/server_status.csv
     fi
   fi
 
   #vm_total_rss=0
   #vm_total_vsz=0
-  sleep 1
+  sleep $sleep_time
 done

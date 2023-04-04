@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 #Memory method
 memory_maximum=0
 
@@ -20,6 +19,9 @@ reboot_count=0
 server_status=0
 sleep_time=10
 server_down_start=0
+
+#force reboot
+force=0
 
 #checks if date A is greater than date B
 function is_date_greater() {
@@ -50,7 +52,13 @@ function reboot_machine() {
   server_down_start=$(date +%s)
   sleep_time=1
   echo "Machine will reboot now"
-  ssh -p 2222 root@localhost "/sbin/shutdown -r now" >/dev/null 2>&1
+  if [ $force -eq 1 ]; then
+    echo "Force reboot"
+    vboxmanage controlvm vmdebian reset
+  else
+    echo "Graceful reboot"
+    ssh -p 2222 root@localhost "/sbin/shutdown -r now"
+  fi
   sleep 2
 }
 
@@ -105,6 +113,10 @@ else
       is_predicted="$1"
       shift
       ;;
+    "-f" | "--force")
+      force=1
+      shift
+      ;;
     *)
       echo "ERROR: Invalid option: \"$opt\"" >&2
       print_usage
@@ -128,8 +140,23 @@ function headers() {
   echo "used;date_time" >logs/monitoramento-disco.csv
   echo "used;cached;buffer;swap-free;date_time" >logs/monitoramento-mem.csv
   echo "num_zumbis;date_time" >logs/monitoramento-zumbis.csv
-  echo "server_down; period; seconds" > logs/server_status.csv
+  echo "server_down; period; seconds" >logs/server_status.csv
 
+}
+
+function verify_server_status() {
+  if [ "$server_status" -eq "-1" ]; then
+    code=$(curl -w "%{http_code}" -o /dev/null -s "http://localhost:8080")
+    if [ "$code" -eq 200 ]; then
+      date_time=$(date +%d-%m-%Y-%H:%M:%S)
+      server_down_end=$(date +%s)
+      result="$((server_down_end - server_down_start))"
+      server_status=0
+      server_down_start=0
+      sleep_time=10
+      echo "$date_time; $reboot_count; $result" >>logs/server_status.csv
+    fi
+  fi
 }
 
 headers
@@ -143,19 +170,12 @@ processos/monitoramento-VBoxXPCOMIPCD.sh &
 processos/monitoramento-VBoxHeadless.sh &
 processos/monitoramento-VBoxSVC.sh &
 
+./machine-resources.sh &
+
 while true; do
   :
 
   date_time=$(date +%d-%m-%Y-%H:%M:%S)
-
-  #source monitoramento-VBoxXPCOMIPCD.sh
-  #source monitoramento-VBoxHeadless.sh
-  #source monitoramento-VBoxSVC.sh
-
-  source monitoramento-cpu.sh
-  source monitoramento-disco.sh
-  source monitoramento-mem.sh
-  source monitoramento-zumbis.sh
 
   if [ "$memory_maximum" -gt 0 ]; then
     memory_method
@@ -167,20 +187,7 @@ while true; do
     time_method
   fi
 
-  if [ "$server_status" -eq "-1" ]; then
-    code=$(curl -w "%{http_code}" -o /dev/null -s "http://localhost:8080")
-    if [ "$code" -eq 200 ]; then
-      date_time=$(date +%d-%m-%Y-%H:%M:%S)
-      server_down_end=$(date +%s)
-      result="$((server_down_end - server_down_start))"
-      server_status=0
-      server_down_start=0
-      sleep_time=10
-      echo "$date_time; $reboot_count; $result" >> logs/server_status.csv
-    fi
-  fi
+  verify_server_status
 
-  #vm_total_rss=0
-  #vm_total_vsz=0
   sleep $sleep_time
 done

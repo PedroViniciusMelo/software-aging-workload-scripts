@@ -43,7 +43,7 @@ function is_number() {
 }
 
 function print_usage() {
-  echo "script usage $(basename "$0")  [-t <integer> minutes] [-m <integer> mb] [-p]" >&2
+  echo "script usage $(basename "$0")  [-t <integer> minutes] [-m <integer> mb] [-p] [-f]" >&2
 }
 
 function reboot_machine() {
@@ -54,7 +54,8 @@ function reboot_machine() {
   echo "Machine will reboot now"
   if [ $force -eq 1 ]; then
     echo "Force reboot"
-    vboxmanage controlvm vmdebian reset
+    vboxmanage controlvm vmdebian acpipowerbutton
+    vboxmanage startvm vmDebian --type headless
   else
     echo "Graceful reboot"
     ssh -p 2222 root@localhost "/sbin/shutdown -r now"

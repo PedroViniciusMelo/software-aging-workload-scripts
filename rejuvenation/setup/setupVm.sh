@@ -21,6 +21,8 @@ vboxmanage startvm vmDebian --type headless
 
 sleep 20
 
+ssh-copy-id -i /root/.ssh/id_rsa.pub -p 2222 root@localhost
+
 curl http://localhost:8080
 
 

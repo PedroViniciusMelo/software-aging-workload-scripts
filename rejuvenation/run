@@ -23,10 +23,13 @@ server_down_start=0
 #force reboot
 force=0
 
+#vm name
+vm_name="vmDebian"
+
 #checks if date A is greater than date B
 function is_date_greater() {
   now=$(date +%s)
-  if [ $now -ge $reboot_date ]; then
+  if [ "$now" -ge $reboot_date ]; then
     echo 1
   else
     echo 0
@@ -51,14 +54,16 @@ function reboot_machine() {
   server_status=-1
   server_down_start=$(date +%s)
   sleep_time=1
-  echo "Machine will reboot now"
+
   if [ $force -eq 1 ]; then
-    echo "Force reboot"
-    vboxmanage controlvm vmdebian acpipowerbutton
-    vboxmanage startvm vmDebian --type headless
+    echo "Machine will reboot now | Graceful reboot"
+    vboxmanage controlvm $vm_name acpipowerbutton
+    sleep 3
+    vboxmanage startvm $vm_name --type headless
   else
-    echo "Graceful reboot"
+    echo "Machine will reboot now | SSH reboot"
     ssh -p 2222 root@localhost "/sbin/shutdown -r now"
+    sleep 3
   fi
   sleep 2
 }
@@ -118,6 +123,10 @@ else
       force=1
       shift
       ;;
+    "-n" | "--name")
+      vm_name="$1"
+      shift
+      ;;
     *)
       echo "ERROR: Invalid option: \"$opt\"" >&2
       print_usage
@@ -142,7 +151,6 @@ function headers() {
   echo "used;cached;buffer;swap-free;date_time" >logs/monitoramento-mem.csv
   echo "num_zumbis;date_time" >logs/monitoramento-zumbis.csv
   echo "server_down; period; seconds" >logs/server_status.csv
-
 }
 
 function verify_server_status() {
@@ -156,13 +164,16 @@ function verify_server_status() {
       server_down_start=0
       sleep_time=10
       echo "$date_time; $reboot_count; $result" >>logs/server_status.csv
+      echo "Server is up again"
     fi
   fi
 }
 
+vboxmanage startvm "$vm_name" --type headless
+
 headers
 
-./workload.sh vmDebian disks/disk 50 &
+./workload.sh "$vm_name" disks/disk 50 &
 
 stap -o fragmentacao.txt memory_fragmentation/fragmentacao2b.stp &
 stap -o fragmentacao-reducao.txt memory_fragmentation/probe_fragmentacao-com-reducao.stp &

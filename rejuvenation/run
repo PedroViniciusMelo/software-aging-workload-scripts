@@ -49,17 +49,27 @@ function print_usage() {
   echo "script usage $(basename "$0")  [-t <integer> minutes] [-m <integer> mb] [-p] [-f]" >&2
 }
 
+function ensure_vm_is_on() {
+    is_running=$(vboxmanage list runningvms | grep $vm_name)
+    while [ -z "$is_running" ]; do
+      vboxmanage startvm $vm_name --type headless
+      sleep 3
+      is_running=$(vboxmanage list runningvms | grep $vm_name)
+    done
+}
+
 function reboot_machine() {
   reboot_count=$((reboot_count + 1))
   server_status=-1
   server_down_start=$(date +%s)
   sleep_time=1
+  cat "1" > rebooting.txt
 
+  vboxmanage storageattach vmDebian --storagectl "SATA" --device 0 --port 1 --type hdd --medium none
   if [ $force -eq 1 ]; then
     echo "Machine will reboot now | Graceful reboot"
     vboxmanage controlvm $vm_name acpipowerbutton
-    sleep 3
-    vboxmanage startvm $vm_name --type headless
+    ensure_vm_is_on
   else
     echo "Machine will reboot now | SSH reboot"
     ssh -p 2222 root@localhost "/sbin/shutdown -r now"
@@ -151,6 +161,7 @@ function headers() {
   echo "used;cached;buffer;swap-free;date_time" >logs/monitoramento-mem.csv
   echo "num_zumbis;date_time" >logs/monitoramento-zumbis.csv
   echo "server_down; period; seconds" >logs/server_status.csv
+  cat "0" > rebooting.txt
 }
 
 function verify_server_status() {

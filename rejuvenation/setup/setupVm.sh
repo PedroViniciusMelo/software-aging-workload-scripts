@@ -1,5 +1,6 @@
 #!/bin/bash
 
+vboxmanage controlvm vmDebian poweroff
 VBoxManage unregistervm vmDebian --delete
 ./remove-disks.sh
 

@@ -15,21 +15,27 @@ wait_time_after_attach=10
 wait_time_after_deattach=10
 count_disks=1
 
+echo "" > disks_events.txt
 while true; do
   if [ "$(cat rebooting.txt)" -eq 1 ]; then
     continue
   fi
   vboxmanage storageattach "$1" --storagectl "SATA" --device 0 --port 1 --type hdd --medium "$2$count_disks.vhd"
+  echo "Attaching: $2$count_disks.vhd" >> disks_events.txt
   sleep $wait_time_after_attach
+
 
   if [ "$(cat rebooting.txt)" -eq 1 ]; then
     continue
   fi
   vboxmanage storageattach "$1" --storagectl "SATA" --device 0 --port 1 --type hdd --medium none
+  echo "Detaching: $2$count_disks.vhd" >> disks_events.txt
   sleep $wait_time_after_deattach
+
 
   if [ "$count_disks" -lt "$3" ]; then
     ((count_disks++))
+    echo "" > disks_events.txt
   else
     count_disks=1
   fi

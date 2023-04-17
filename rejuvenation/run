@@ -75,6 +75,7 @@ function reboot_machine() {
     ssh -p 2222 root@localhost "/sbin/shutdown -r now"
     sleep 3
   fi
+  echo "0" > rebooting.txt
   sleep 2
 }
 

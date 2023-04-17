@@ -53,6 +53,7 @@ function ensure_vm_is_on() {
     is_running=$(vboxmanage list runningvms | grep $vm_name)
     while [ -z "$is_running" ]; do
       vboxmanage startvm $vm_name --type headless
+      echo "Trying to start vm again"
       sleep 3
       is_running=$(vboxmanage list runningvms | grep $vm_name)
     done

@@ -19,7 +19,7 @@ while true; do
 
     echo "$cpu;$mem;$vmrss;$vsz;$thread;$swap;$date_time" >> logs/monitoramento-VBoxXPCOMIPCD.csv
   else
-    echo "pid is empty, probably due to the virtual machine being turned off"
+    sleep 1
     echo "0;0;0;0;0;0;0" >> logs/monitoramento-VBoxXPCOMIPCD.csv
   fi
 

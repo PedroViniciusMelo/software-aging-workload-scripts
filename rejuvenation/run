@@ -63,7 +63,7 @@ function reboot_machine() {
   server_status=-1
   server_down_start=$(date +%s)
   sleep_time=1
-  cat "1" > rebooting.txt
+  echo "1" > rebooting.txt
 
   vboxmanage storageattach vmDebian --storagectl "SATA" --device 0 --port 1 --type hdd --medium none
   if [ $force -eq 1 ]; then
@@ -161,7 +161,7 @@ function headers() {
   echo "used;cached;buffer;swap-free;date_time" >logs/monitoramento-mem.csv
   echo "num_zumbis;date_time" >logs/monitoramento-zumbis.csv
   echo "server_down; period; seconds" >logs/server_status.csv
-  cat "0" > rebooting.txt
+  echo "0" > rebooting.txt
 }
 
 function verify_server_status() {

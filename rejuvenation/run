@@ -64,8 +64,8 @@ function reboot_machine() {
 function time_method() {
   result=$(is_date_greater $reboot_date)
   if [ "$result" -eq 1 ]; then
-    reboot_machine
     reboot_date=$(date -d "($reboot_date) +$minutes mins" +%s)
+    reboot_machine
   fi
 }
 
@@ -194,15 +194,7 @@ while true; do
 
   date_time=$(date +%d-%m-%Y-%H:%M:%S)
 
-  if [ "$memory_maximum" -gt 0 ]; then
-    memory_method
-  fi
-  if [ "$is_predicted" -gt 0 ]; then
-    predict_method
-  fi
-  if [ "$reboot_date" -gt 0 ]; then
-    time_method
-  fi
+  time_method
 
   verify_server_status
 

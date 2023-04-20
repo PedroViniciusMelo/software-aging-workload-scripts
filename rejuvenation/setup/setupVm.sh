@@ -31,10 +31,3 @@ sleep 30
 ssh-copy-id -i /root/.ssh/id_rsa.pub -p 2222 root@localhost
 
 curl http://localhost:8080
-
-echo "Would you like to start the test? (y/n)"
-read -r start
-
-if [ "$start" = "y" ]; then
-  ./rejuvenation/run.sh -n vmDebian -ssh
-fi

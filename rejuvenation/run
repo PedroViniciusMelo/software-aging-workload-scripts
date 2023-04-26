@@ -1,14 +1,5 @@
 #!/bin/bash
 
-#Memory method
-memory_maximum=0
-
-vm_total_rss=0
-vm_total_vsz=0
-
-#TODO Predict method
-is_predicted=0
-
 #Time method
 start_date=$(date +%s)
 reboot_date=0
@@ -53,11 +44,9 @@ function reboot_machine() {
   ((reboot_count++))
   server_down_start=$(date +%s)
 
-  echo "1" >rebooting.txt
 
   ./reboot_machine.sh $force $soft $ssh $vm_name
 
-  echo "0" >rebooting.txt
   sleep 2
 }
 
@@ -69,24 +58,9 @@ function time_method() {
   fi
 }
 
-function memory_method() {
-  if [ $vm_total_rss -gt $memory_maximum ]; then
-    echo "RSS exceeded"
-    reboot_machine
-  fi
-
-  if [ $vm_total_vsz -gt $memory_maximum ]; then
-    echo "VSS exceeded"
-    reboot_machine
-  fi
-}
-
-function predict_method() {
-  echo "predict method"
-}
-
 if [[ "$1" =~ ^((-{1,2})([Hh]$|[Hh][Ee][Ll][Pp])|)$ ]]; then
-  echo "Iniciando testes de rejuvenescimento | Coleta de dados"
+ print_usage
+ exit 0
 else
   while [[ $# -gt 0 ]]; do
     opt="$1"
@@ -101,15 +75,6 @@ else
       minutes=$1
       reboot_date=$(date -d "($start_date) +$1 mins" +%s)
       echo "Iniciando testes de rejuvenescimento | A MV irá reinciar a cada $minutes minutos"
-      shift
-      ;;
-    "-m" | "--memory")
-      memory_maximum=$(($1 * 1024))
-      echo "Iniciando testes de rejuvenescimento | A MV irá reinciar quando o RSS ou VSS extrapolarem  $1 MBS"
-      shift
-      ;;
-    "-p" | "--predicted")
-      is_predicted="$1"
       shift
       ;;
     "-f" | "--force")
@@ -156,7 +121,6 @@ function headers() {
   echo "used;cached;buffer;swap-free;date_time" >logs/monitoramento-mem.csv
   echo "num_zumbis;date_time" >logs/monitoramento-zumbis.csv
   echo "server_down; period; seconds" >logs/server_status.csv
-  echo "0" >rebooting.txt
 }
 
 function verify_server_status() {
@@ -174,7 +138,15 @@ function verify_server_status() {
   fi
 }
 
-vboxmanage startvm "$vm_name" --type headless
+
+
+rebooted=$(vboxmanage list runningvms | grep "$vm_name")
+if [[ "$rebooted" == "" ]]; then
+  vboxmanage startvm "$vm_name" --type headless
+  echo "Turned on machine"
+else
+  echo "Machine is already on"
+fi
 
 headers
 

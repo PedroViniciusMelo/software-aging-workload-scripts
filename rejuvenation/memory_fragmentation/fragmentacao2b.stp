@@ -1,4 +1,4 @@
-global alloc, fallback, fragmenting = 0, index = 0, print_count = 0
+global alloc, fallback, fragmenting = 0, index = 0
 global who[100]
 
 probe kernel.trace("mm_page_alloc_extfrag"){	
@@ -9,7 +9,7 @@ probe kernel.trace("mm_page_alloc_extfrag"){
 			delete who
 			printf("\n\n>>> Vetor esvaziado\n\n,")
 		}
-		printf("Processo: %s(%d) / Pai: %s(%d) / UID: %d,", execname(),pid(),pexecname(),ppid(),uid())
+		//printf("Processo: %s(%d) / Pai: %s(%d) / UID: %d,", execname(),pid(),pexecname(),ppid(),uid())
 		index++
 	}
 	who[execname(),pid(),pexecname(),ppid(),uid()]++
@@ -22,20 +22,18 @@ probe kernel.trace("mm_page_alloc_extfrag"){
 
 function imprime_processos() {
     printf("\n%s\n", ctime(gettimeofday_s()));
-    printf("process; parent; UID; process_occurrences\n");
+    printf("process; parent; UID; process_occurrences; fragmented\n");
 	foreach([process,pid,pexecname,ppid,uid] in who){
-		printf("%s(%d); %s(%d); %d; %d\n", process,pid,pexecname,ppid,uid,who[process,pid,pexecname,ppid,uid]);
+		printf("%s(%d); %s(%d); %d; %d; %d\n", process,pid,pexecname,ppid,uid,who[process,pid,pexecname,ppid,uid], fragmenting);
 	}
 }
 
 //tempo a cada impressao dos valores
 probe timer.s(30) {
 	imprime_processos();
-	printf("Ocorrencia: %d", fragmenting);
 }
 
 probe end{
     imprime_processos();
-    printf("Ocorrencia: %d", fragmenting);
 }
 

@@ -25,15 +25,15 @@ probe begin{
 }
 
 function imprime_processos() {
-    var date = ctime(gettimeofday_s());
+    date = ctime(gettimeofday_s());
 	foreach([process,pid,pexecname,ppid,uid] in who){
-        var occurrences = who[process,pid,pexecname,ppid,uid]
+        occurrences = who[process,pid,pexecname,ppid,uid];
 		printf("%s(%d);%s(%d);%d;%d;%d;%s\n", process, pid, pexecname, ppid, uid, occurrences, fragmenting, date);
 	}
 }
 
 //tempo a cada impressao dos valores
-probe timer.s(30) {
+probe timer.s(120) {
 	imprime_processos();
 }
 

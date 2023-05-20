@@ -20,11 +20,15 @@ probe kernel.trace("mm_page_alloc_extfrag"){
 	}
 }
 
+probe begin{
+	printf("process;parent;UID;process_occurrences;fragmented;datetime\n");
+}
+
 function imprime_processos() {
-    printf("\n%s\n", ctime(gettimeofday_s()));
-    printf("process; parent; UID; process_occurrences; fragmented\n");
+    var date = ctime(gettimeofday_s());
 	foreach([process,pid,pexecname,ppid,uid] in who){
-		printf("%s(%d); %s(%d); %d; %d; %d\n", process,pid,pexecname,ppid,uid,who[process,pid,pexecname,ppid,uid], fragmenting);
+        var occurrences = who[process,pid,pexecname,ppid,uid]
+		printf("%s(%d);%s(%d);%d;%d;%d;%s\n", process, pid, pexecname, ppid, uid, occurrences, fragmenting, date);
 	}
 }
 

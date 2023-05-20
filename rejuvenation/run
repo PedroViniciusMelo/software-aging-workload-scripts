@@ -152,8 +152,7 @@ headers
 
 ./workload.sh "$vm_name" disks/disk 50 &
 
-stap -o fragmentacao.txt memory_fragmentation/fragmentacao2b.stp &
-stap -o fragmentacao-reducao.txt memory_fragmentation/probe_fragmentacao-com-reducao.stp &
+stap -o fragmentacao.txt logs/memory_fragmentation/fragmentacao2b.stp &
 
 processos/monitoramento-VBoxXPCOMIPCD.sh &
 processos/monitoramento-VBoxHeadless.sh &

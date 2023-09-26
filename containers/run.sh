@@ -1,7 +1,6 @@
 #!/bin/bash
 source config.sh
 source commom.sh
-container_id=""
 informative=$1
 
 if [ $remove_image -eq 0 ]; then
@@ -35,14 +34,13 @@ while [[ $max_runs -gt 0 ]]; do
       echo "Instantiate time: $instantiate_time"
     fi
 
-    container_id=$(docker ps -a | grep "$image" | awk '{print $1}')
-    stop_time=$(monitor_action stop_command "$container_id")
+    stop_time=$(monitor_action stop_command)
 
     if [ -n "$informative" ]; then
       echo "Stop time: $stop_time"
     fi
 
-    container_removal_time=$(monitor_action remove_container_command "$container_id")
+    container_removal_time=$(monitor_action remove_container_command)
 
     if [ -n "$informative" ]; then
       echo "Container remove time: $container_removal_time"
@@ -59,7 +57,7 @@ while [[ $max_runs -gt 0 ]]; do
     fi
 
     display_date=$(get_date_time)
-    echo "$pull_time;$instantiate_time;$stop_time;$container_removal_time;$image_removal_time;$display_date" >>"logs/$log_file"
+    echo "$pull_time;$instantiate_time;$stop_time;$container_removal_time;$image_removal_time;$display_date" >> "logs/$log_file"
     max_runs=$((max_runs - 1))
   fi
 done

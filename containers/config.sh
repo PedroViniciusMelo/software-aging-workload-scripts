@@ -10,34 +10,23 @@ display_name="software-aging"
 local="local"
 
 function pull_command() {
-  if [[ -z "$image_tag" ]]; then
-    image_tag="latest"
-  fi
   docker pull "$image:$image_tag"
 }
 
 function start_command() {
-  if [[ -z "$image_tag" ]]; then
-    image_tag="latest"
-  fi
   docker run -d "$image:$image_tag"
 }
 
 function stop_command() {
-  local container_name=$1
-  docker stop "$container_name"
+  docker container stop $(docker container ls -aq)
 }
 
 function remove_image_command() {
-  if [[ -z "$image_tag" ]]; then
-    image_tag="latest"
-  fi
   docker rmi "$image:$image_tag"
 }
 
 function remove_container_command() {
-  local container_name=$1
-  docker rm "$container_name"
+  docker rm $(docker container ls -aq)
 }
 
 mkdir -p "logs"

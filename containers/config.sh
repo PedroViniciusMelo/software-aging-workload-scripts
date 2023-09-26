@@ -2,11 +2,11 @@
 
 image="docker.io/pedrmelo/software-aging"
 max_runs=100
-remove_image=0
+remove_image=1
 image_tag="500mb"
 
 #Not important, just to control the file name
-display_name="software-aging-500mb"
+display_name="software-aging"
 local="local"
 
 function pull_command() {

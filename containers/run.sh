@@ -2,7 +2,7 @@
 source config.sh
 source commom.sh
 container_id=""
-
+informative=$1
 
 if [ $remove_image -eq 0 ]; then
   if [ ! "$pull" ]; then
@@ -18,20 +18,44 @@ while [[ $max_runs -gt 0 ]]; do
     pull_time=0
   fi
 
-  is_image_available=$(docker images | grep "$image")
+  if [ -n "$informative" ]; then
+    echo "Pull time: $pull_time"
+  fi
+
+  is_image_available=$(docker image ls -a | grep "$display_name" | awk '{print $3}')
+
+  if [ -n "$informative" ]; then
+    echo "Image ID: $is_image_available"
+  fi
 
   if [ -n "$is_image_available" ]; then
     instantiate_time=$(monitor_action start_command)
 
+    if [ -n "$informative" ]; then
+      echo "Instantiate time: $instantiate_time"
+    fi
+
     container_id=$(docker ps -a | grep "$image" | awk '{print $1}')
     stop_time=$(monitor_action stop_command "$container_id")
 
+    if [ -n "$informative" ]; then
+      echo "Stop time: $stop_time"
+    fi
+
     container_removal_time=$(monitor_action remove_container_command "$container_id")
+
+    if [ -n "$informative" ]; then
+      echo "Container remove time: $container_removal_time"
+    fi
 
     if [ $remove_image -eq 1 ]; then
       image_removal_time=$(monitor_action remove_image_command)
     else
       image_removal_time=0
+    fi
+
+    if [ -n "$informative" ]; then
+      echo "Image remove time: $image_removal_time"
     fi
 
     display_date=$(get_date_time)

@@ -4,7 +4,7 @@ source commom.sh
 informative=$1
 
 if [ $remove_image -eq 0 ]; then
-  if [ ! "$pull" ]; then
+  if [ ! "$(pull_command)" ]; then
     echo "Erro ao baixar a imagem $image:$image_tag"
     exit 1
   fi
@@ -12,7 +12,7 @@ fi
 
 while [[ $max_runs -gt 0 ]]; do
   if [ $remove_image -eq 1 ]; then
-    pull_time=$(monitor_action pull_command)
+    pull_time=$(pull_command)
   else
     pull_time=0
   fi
@@ -28,26 +28,26 @@ while [[ $max_runs -gt 0 ]]; do
   fi
 
   if [ -n "$is_image_available" ]; then
-    instantiate_time=$(monitor_action start_command)
+    instantiate_time=$(start_command)
 
     if [ -n "$informative" ]; then
       echo "Instantiate time: $instantiate_time"
     fi
 
-    stop_time=$(monitor_action stop_command)
+    stop_time=$(stop_command)
 
     if [ -n "$informative" ]; then
       echo "Stop time: $stop_time"
     fi
 
-    container_removal_time=$(monitor_action remove_container_command)
+    container_removal_time=$(remove_container_command)
 
     if [ -n "$informative" ]; then
       echo "Container remove time: $container_removal_time"
     fi
 
     if [ $remove_image -eq 1 ]; then
-      image_removal_time=$(monitor_action remove_image_command)
+      image_removal_time=$(remove_image_command)
     else
       image_removal_time=0
     fi

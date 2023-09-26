@@ -6,20 +6,6 @@ function get_date_time() {
   echo "$date_time"
 }
 
-function monitor_action() {
-  local action start end total params
-  action=$1
-  params=$2
-  start=$(date +%s%N)
-
-  eval $action $params
-
-  end=$(date +%s%N)
-  total=$((end - start))
-  echo $total
-}
-
-
 function progress {
   _progrees=$((($1 * 10000 / $2) / 100))
   _done=$((($_progrees * 6) / 10))

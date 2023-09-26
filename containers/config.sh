@@ -10,23 +10,63 @@ display_name="software-aging"
 local="local"
 
 function pull_command() {
+  local action start end total params
+  action=$1
+  start=$(date +%s%N)
+
   docker pull "$image:$image_tag"
+
+  end=$(date +%s%N)
+  total=$((end - start))
+  echo $total
 }
 
 function start_command() {
+  local action start end total params
+  action=$1
+  start=$(date +%s%N)
+
   docker run -d "$image:$image_tag"
+
+  end=$(date +%s%N)
+  total=$((end - start))
+  echo $total
 }
 
 function stop_command() {
+  local action start end total params
+  action=$1
+  start=$(date +%s%N)
+
   docker container stop $(docker container ls -aq)
+
+  end=$(date +%s%N)
+  total=$((end - start))
+  echo $total
 }
 
 function remove_image_command() {
+  local action start end total params
+  action=$1
+  start=$(date +%s%N)
+
   docker rmi "$image:$image_tag"
+
+  end=$(date +%s%N)
+  total=$((end - start))
+  echo $total
 }
 
 function remove_container_command() {
+  local action start end total params
+  action=$1
+  start=$(date +%s%N)
+
   docker rm $(docker container ls -aq)
+
+  end=$(date +%s%N)
+  total=$((end - start))
+  echo $total
 }
 
 mkdir -p "logs"
@@ -41,4 +81,4 @@ else
   log_file="$display_name-$(date +%Y%m%d%H%M%S).csv"
 fi
 
-echo "pull;start;stop;rm_container;rm_image;time" > "logs/$log_file"
+echo "pull;start;stop;rm_container;rm_image;time" >"logs/$log_file"

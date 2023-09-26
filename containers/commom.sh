@@ -7,11 +7,12 @@ function get_date_time() {
 }
 
 function monitor_action() {
-  local action start end total
+  local action start end total params
   action=$1
+  params=$2
   start=$(date +%s%N)
 
-  eval $action
+  eval "$action" "$params"
 
   end=$(date +%s%N)
   total=$((end - start))

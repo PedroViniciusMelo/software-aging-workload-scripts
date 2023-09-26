@@ -10,40 +10,34 @@ display_name="software-aging-500mb"
 local="local"
 
 function pull_command() {
-  local image_name=$1
-  local image_tag=$2
   if [[ -z "$image_tag" ]]; then
     image_tag="latest"
   fi
-  echo "docker pull $image_name:$image_tag"
+  docker pull "$image:$image_tag"
 }
 
 function start_command() {
-  local image_name=$1
-  local image_tag=$2
   if [[ -z "$image_tag" ]]; then
     image_tag="latest"
   fi
-  echo "docker run -d $image_name:$image_tag"
+  docker run -d "$image:$image_tag"
 }
 
 function stop_command() {
   local container_name=$1
-  echo "docker stop $container_name"
+  docker stop "$container_name"
 }
 
 function remove_image_command() {
-  local image_name=$1
-  local image_tag=$2
   if [[ -z "$image_tag" ]]; then
     image_tag="latest"
   fi
-  echo "docker rmi $image_name:$image_tag"
+  docker rmi "$image:$image_tag"
 }
 
 function remove_container_command() {
   local container_name=$1
-  echo "docker rm $container_name"
+  docker rm "$container_name"
 }
 
 mkdir -p "logs"

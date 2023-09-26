@@ -3,9 +3,6 @@ source config.sh
 source commom.sh
 container_id=""
 
-pull=$(pull_command "$image" "$image_tag")
-instantiate=$(start_command "$image" "$image_tag")
-image_removal=$(remove_image_command "$image" "$image_tag")
 
 if [ $remove_image -eq 0 ]; then
   if [ ! "$pull" ]; then
@@ -16,7 +13,7 @@ fi
 
 while [[ $max_runs -gt 0 ]]; do
   if [ $remove_image -eq 1 ]; then
-    pull_time=$(monitor_action $pull)
+    pull_time=$(monitor_action pull_command)
   else
     pull_time=0
   fi
@@ -24,19 +21,17 @@ while [[ $max_runs -gt 0 ]]; do
   is_image_available=$(docker images | grep "$image")
 
   if [ -n "$is_image_available" ]; then
-    instantiate_time=$(monitor_action "$instantiate")
+    instantiate_time=$(monitor_action start_command)
 
     container_id=$(docker ps -a | grep "$image" | awk '{print $1}')
-    stop=$(stop_command "$container_id")
-    stop_time=$(monitor_action "$stop")
+    stop_time=$(monitor_action stop_command "$container_id")
 
-    container_removal=$(remove_container_command "$container_id")
-    container_removal_time=$(monitor_action "$container_removal")
+    container_removal_time=$(monitor_action remove_container_command "$container_id")
 
     if [ $remove_image -eq 1 ]; then
-      image_removal_time=$(monitor_action "$image_removal")
+      image_removal_time=$(monitor_action remove_image_command)
     else
-      image_removal=0
+      image_removal_time=0
     fi
 
     display_date=$(get_date_time)

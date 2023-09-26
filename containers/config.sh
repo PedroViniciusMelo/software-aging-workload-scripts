@@ -1,10 +1,13 @@
 #!/bin/bash
 
 image="docker.io/pedrmelo/software-aging"
-image_tag="500mb"
-local="local"
 max_runs=100
 remove_image=0
+image_tag="500mb"
+
+#Not important, just to control the file name
+display_name="software-aging-500mb"
+local="local"
 
 function pull_command() {
   local image_name=$1
@@ -47,12 +50,12 @@ mkdir -p "logs"
 
 if [ $remove_image -eq 1 ]; then
   if [ "$local" == "local" ]; then
-    log_file="$image-rmi-local-$(date +%Y%m%d%H%M%S).csv"
+    log_file="$display_name-rmi-local-$(date +%Y%m%d%H%M%S).csv"
   else
-    log_file="$image-rmi-$(date +%Y%m%d%H%M%S).csv"
+    log_file="$display_name-rmi-$(date +%Y%m%d%H%M%S).csv"
   fi
 else
-  log_file="$image-$(date +%Y%m%d%H%M%S).csv"
+  log_file="$display_name-$(date +%Y%m%d%H%M%S).csv"
 fi
 
 echo "pull;start;stop;rm_container;rm_image;time" > "logs/$log_file"

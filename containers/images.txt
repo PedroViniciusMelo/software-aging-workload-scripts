@@ -1,0 +1,4 @@
+docker.io/pedrmelo/software-aging:500mb
+docker.io/pedrmelo/software-aging:1gb
+docker.io/pedrmelo/software-aging:2gb
+docker.io/pedrmelo/software-aging:3gb

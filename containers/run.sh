@@ -40,7 +40,7 @@ while [[ $max_runs -gt 0 ]]; do
     fi
 
     display_date=$(get_date_time)
-    echo "$display_date;$pull_time;$instantiate_time;$stop_time;$container_removal_time;$image_removal_time" >> "logs/$log_file"
+    echo "$pull_time;$instantiate_time;$stop_time;$container_removal_time;$image_removal_time;$display_date" >>"logs/$log_file"
     max_runs=$((max_runs - 1))
   fi
 done

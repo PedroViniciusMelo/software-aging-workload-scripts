@@ -12,7 +12,7 @@ function monitor_action() {
   params=$2
   start=$(date +%s%N)
 
-  eval "$action" "$params"
+  eval $action $params
 
   end=$(date +%s%N)
   total=$((end - start))

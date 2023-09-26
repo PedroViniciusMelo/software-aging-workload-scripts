@@ -10,11 +10,10 @@ display_name="software-aging"
 local="local"
 
 function pull_command() {
-  local action start end total params
-  action=$1
+  local start end total
   start=$(date +%s%N)
 
-  docker pull "$image:$image_tag"
+  docker pull "$image:$image_tag"  > /dev/null
 
   end=$(date +%s%N)
   total=$((end - start))
@@ -22,11 +21,10 @@ function pull_command() {
 }
 
 function start_command() {
-  local action start end total params
-  action=$1
+  local start end total
   start=$(date +%s%N)
 
-  docker run -d "$image:$image_tag"
+  docker run -d "$image:$image_tag"  > /dev/null
 
   end=$(date +%s%N)
   total=$((end - start))
@@ -34,11 +32,10 @@ function start_command() {
 }
 
 function stop_command() {
-  local action start end total params
-  action=$1
+  local start end total
   start=$(date +%s%N)
 
-  docker container stop $(docker container ls -aq)
+  docker container stop $(docker container ls -aq)  > /dev/null
 
   end=$(date +%s%N)
   total=$((end - start))
@@ -46,11 +43,10 @@ function stop_command() {
 }
 
 function remove_image_command() {
-  local action start end total params
-  action=$1
+  local start end total
   start=$(date +%s%N)
 
-  docker rmi "$image:$image_tag"
+  docker rmi "$image:$image_tag"  > /dev/null
 
   end=$(date +%s%N)
   total=$((end - start))
@@ -58,15 +54,20 @@ function remove_image_command() {
 }
 
 function remove_container_command() {
-  local action start end total params
-  action=$1
+  local start end total
   start=$(date +%s%N)
 
-  docker rm $(docker container ls -aq)
+  docker rm $(docker container ls -aq) > /dev/null
 
   end=$(date +%s%N)
   total=$((end - start))
   echo $total
+}
+
+function is_image_available() {
+  local result
+  result=$(docker image ls -a | grep "$display_name" | awk '{print $3}')
+  echo "$result"
 }
 
 mkdir -p "logs"

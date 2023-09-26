@@ -4,13 +4,16 @@ source commom.sh
 informative=$1
 
 if [ $remove_image -eq 0 ]; then
-  if [ ! "$(pull_command)" ]; then
+  pull_command
+  image_available=$(is_image_available)
+  if [ -z "$image_available" ]; then
     echo "Erro ao baixar a imagem $image:$image_tag"
     exit 1
   fi
 fi
 
 while [[ $max_runs -gt 0 ]]; do
+  echo "Runs left: $max_runs"
   if [ $remove_image -eq 1 ]; then
     pull_time=$(pull_command)
   else
@@ -21,13 +24,13 @@ while [[ $max_runs -gt 0 ]]; do
     echo "Pull time: $pull_time"
   fi
 
-  is_image_available=$(docker image ls -a | grep "$display_name" | awk '{print $3}')
+  image_available=$(is_image_available)
 
   if [ -n "$informative" ]; then
-    echo "Image ID: $is_image_available"
+    echo "Image ID: $image_available"
   fi
 
-  if [ -n "$is_image_available" ]; then
+  if [ -n "$image_available" ]; then
     instantiate_time=$(start_command)
 
     if [ -n "$informative" ]; then
@@ -57,7 +60,11 @@ while [[ $max_runs -gt 0 ]]; do
     fi
 
     display_date=$(get_date_time)
-    echo "$pull_time;$instantiate_time;$stop_time;$container_removal_time;$image_removal_time;$display_date" >> "logs/$log_file"
+    echo "$pull_time;$instantiate_time;$stop_time;$container_removal_time;$image_removal_time;$display_date" >>"logs/$log_file"
     max_runs=$((max_runs - 1))
+    image_available=""
+  fi
+  if [ -z "$informative" ]; then
+    clear
   fi
 done

@@ -11,9 +11,7 @@ function monitor_action() {
   action=$1
   start=$(date +%s%N)
 
-  if [ ! "$action" ] ; then
-    echo 0
-  fi
+  eval $action
 
   end=$(date +%s%N)
   total=$((end - start))

@@ -16,7 +16,7 @@ fi
 
 while [[ $max_runs -gt 0 ]]; do
   if [ $remove_image -eq 1 ]; then
-    pull_time=$(monitor_action "$pull")
+    pull_time=$(monitor_action $pull)
   else
     pull_time=0
   fi

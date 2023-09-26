@@ -55,8 +55,4 @@ else
   log_file="$image-$(date +%Y%m%d%H%M%S).csv"
 fi
 
-if [ "$remove_image" -eq 0 ]; then
-  echo "pull_time,instantiate_time,stop_time,container_removal_time,image_removal_time,date,time" >"logs/$log_file"
-else
-  echo "instantiate_time,stop_time,container_removal_time,date,time" >"logs/$log_file"
-fi
+echo "pull;start;stop;rm_container;rm_image;time" > "logs/$log_file"
